@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plantid - Identificador de Plantas</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --text-color: #333;
+            --background-color: #f0f0f0;
+            --error-color: #ff6b6b;
+            --dark-bg-color: #1e1e1e;
+            --dark-text-color: #f0f0f0;
+            --container-padding: 40px;
+            --container-max-width: 800px;
+            --transition-speed: 0.3s;
+        }
+
+        body.dark {
+            --text-color: var(--dark-text-color);
+            --background-color: var(--dark-bg-color);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 20px;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+
+        .container {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            background-color: #fff;
+            padding: var(--container-padding);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+            transition: padding var(--transition-speed) ease;
+        }
+
+        body.dark .container {
+            background-color: #2c2c2c;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+            font-size: 2.5rem;
+            transition: color var(--transition-speed) ease;
+        }
+
+        h1.dark {
+            color: #f0f0f0;
+        }
+
+        #toggle-mode {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 24px;
+            transition: transform var(--transition-speed) ease;
+            z-index: 1000;
+        }
+
+        #toggle-mode:hover {
+            transform: rotate(20deg);
+        }
+
+        #upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        #upload-label {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: auto;
+            max-width: 100%;
+            text-align: center;
+        }
+
+        #upload-label.dark {
+            background-color: #555;
+            color: #fff;
+        }
+
+        #upload-label:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        #identify-btn {
+            display: none;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: auto;
+            max-width: 100%;
+            text-align: center;
+        }
+
+        #identify-btn.dark {
+            background-color: #555;
+            color: #fff;
+        }
+
+        #identify-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        #image-preview {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border-radius: 12px;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform var(--transition-speed) ease;
+        }
+
+        #image-preview:hover {
+            transform: scale(1.02);
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            display: none;
+            color: #000000;
+            animation: fadeIn 1s ease-in-out;
+            word-wrap: break-word;
+        }
+
+        body.dark #result {
+            background-color: #5c6961;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: var(--primary-color);
+            animation: bounce 2s infinite;
+        }
+
+        .error {
+            color: var(--error-color);
+            background-color: #ffe5e5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            animation: shake 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            :root {
+                --container-max-width: 90%;
+            }
+        }
+
+        @media (max-width: 992px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            #toggle-mode {
+                top: 15px;
+                right: 15px;
+                font-size: 20px;
+            }
+
+            #upload-label, #identify-btn {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 25px;
+            }
+
+            #toggle-mode {
+                top: 10px;
+                right: 10px;
+                font-size: 18px;
+            }
+
+            #upload-label, #identify-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            #toggle-mode {
+                top: 5px;
+                right: 5px;
+                font-size: 16px;
+            }
+
+            #upload-label, #identify-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 1.3rem;
+            }
+
+            #upload-label, #identify-btn {
+                font-size: 13px;
+                padding: 8px;
+            }
+
+            #loading {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container animate__animated animate__fadeIn">
+        <h1 id="title">Plantid</h1>
+        <button id="toggle-mode"><i class="fas fa-moon"></i></button>
+        <div id="upload-container">
+            <label for="file-input" id="upload-label"><i class="fas fa-upload"></i> Cargar imagen de planta</label>
+            <input type="file" id="file-input" accept="image/*">
+            <img id="image-preview" alt="Vista previa de la planta" class="animate__animated">
+            <button id="identify-btn"><i class="fas fa-leaf"></i> Identificar Planta</button>
+        </div>
+        <div id="loading"><i class="fas fa-spinner fa-spin"></i> Identificando planta...</div>
+        <div id="result" class="animate__animated"></div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const API_KEY = 'AIzaSyCohti9DjGEeNX2WWqZ3VDFcbxlQN7LClE'; // Reemplaza esto con tu clave API real
+        const fileInput = document.getElementById('file-input');
+        const imagePreview = document.getElementById('image-preview');
+        const identifyBtn = document.getElementById('identify-btn');
+        const resultDiv = document.getElementById('result');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const toggleMode = document.getElementById('toggle-mode');
+        const heading = document.getElementById('title');
+
+        let isDarkMode = false;
+
+        toggleMode.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark', isDarkMode);
+            toggleMode.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+            // Cambiar clases para el título, botones y etiquetas
+            const uploadLabel = document.getElementById('upload-label');
+            uploadLabel.classList.toggle('dark', isDarkMode);
+            identifyBtn.classList.toggle('dark', isDarkMode);
+            heading.classList.toggle('dark', isDarkMode);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    identifyBtn.style.display = 'inline-flex';
+                    imagePreview.classList.remove('animate__fadeOut');
+                    imagePreview.classList.add('animate__fadeIn');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        identifyBtn.addEventListener('click', async () => {
+            if (!imagePreview.src) return;
+
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                {text: "Identifica esta planta y proporciona la siguiente información en español:\n1. Nombre común\n2. Nombre científico\n3. Familia\n4. Características principales\n5. Cuidados básicos\n6. Un dato interesante\nPresenta la información de manera concisa y estructurada."},
+                                {
+                                    inline_data: {
+                                        mime_type: "image/jpeg",
+                                        data: imagePreview.src.split(',')[1]
+                                    }
+                                }
+                            ]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+
+                resultDiv.innerHTML = `<h2>Resultado:</h2><p>${text.replace(/\n/g, '<br>')}</p>`;
+                resultDiv.style.display = 'block';
+                resultDiv.classList.remove('animate__fadeOut');
+                resultDiv.classList.add('animate__fadeIn');
+            } catch (error) {
+                console.error('Error:', error);
+                errorDiv.textContent = `Error: ${error.message}. Por favor, verifica la clave API y tu conexión a internet.`;
+                errorDiv.style.display = 'block';
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
